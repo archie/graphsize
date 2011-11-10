@@ -23,7 +23,6 @@ def UIS_WR(I,n):
 def UIS_WOR(I,n):
     return random.sample(I,n)
 
-
 def WIS_WR(I_W):
     # From http://code.activestate.com/recipes/117241/
     # I_W is a list of (item,weight) tuples,
@@ -35,3 +34,11 @@ def WIS_WR(I_W):
             break
         n = n - weight
     return item 
+
+def estimate_size(graph):
+    sample = UIS_WR(graph, 1000)
+    size = ((Y1 * Y2)/(2*collisions(sample)))
+    print size
+
+def collisions(sample):
+    return 5
