@@ -26,7 +26,7 @@ def UIS_WOR(I,n):
 def WIS_WR(I_W):
     # From http://code.activestate.com/recipes/117241/
     # I_W is a list of (item,weight) tuples,
-    # e.g. I_W = [(‘A', 1.25),(‘B', 2.5), (‘C’, 3.0)]
+    # e.g. I_W = [('A', 1.25),('B', 2.5), ('C', 3.0)]
     weight_sum = sum(weight for item,weight in I_W)
     n = random.uniform(0, weight_sum)
     for item, weight in I_W:
@@ -40,5 +40,10 @@ def estimate_size(graph):
     size = ((Y1 * Y2)/(2*collisions(sample)))
     print size
 
-def collisions(sample):
-    return 5
+def collisions(sample): #assume sample is list
+    uniques = set(item for item in sample)
+    return [(item, sample.count(item)) for item in uniques]
+
+if __name__ == "__main__":
+    list = [1,2,2,2,3,5,6,4,5]
+    print collisions(list)
