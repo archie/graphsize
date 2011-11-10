@@ -47,3 +47,22 @@ def collisions(sample): #assume sample is list
 if __name__ == "__main__":
     list = [1,2,2,2,3,5,6,4,5]
     print collisions(list)
+
+# TODO: add thinning?
+# def MHRW(nodes, length):
+#     """Metropolis-Hastings Random Walk"""
+#     first_node = random.choice(nodes)
+#     return _MHRW(length, first_node, thinning)
+# 
+# def _MHRW(remaining, current):
+#     if remaining > 0
+#         neighbour = random.choice(neighbours)
+#         if degree(neighbour) < degree(current)
+#             current = neighbour
+#         else
+#             probability_of_transition = (degree(current).to_float / degree(neighbour))
+#             if random(1) < probability_of_transition
+#                 current = neighbour
+#         _MHRW(length-1, current)
+#     else
+#         return current_node
