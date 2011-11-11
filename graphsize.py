@@ -12,6 +12,7 @@ What do you observe?
 
 import networkx as nx
 import random
+import math
 
 Graph = nx.read_edgelist("p2p-Gnutella31.txt",
                          delimiter='\t',  
@@ -36,17 +37,31 @@ def WIS_WR(I_W):
     return item 
 
 def estimate_size(graph):
-    sample = UIS_WR(graph, 1000)
-    size = ((Y1 * Y2)/(2*collisions(sample)))
-    print size
+    graph_sample = UIS_WR(graph, 1000)
+    degrees = [len(node) for node in graph_sample]
 
-def collisions(sample): #assume sample is list
-    uniques = set(item for item in sample)
-    return [(item, sample.count(item)) for item in uniques]
+    sum_of_degrees = sum(degrees)
+    sum_of_inverse_degrees = sum([1/degree for degree in degrees])
+    identical_samples = collisions(graph_sample)
 
-if __name__ == "__main__":
-    list = [1,2,2,2,3,5,6,4,5]
-    print collisions(list)
+    print 'Y1: ', sum_of_degrees
+    print 'Y2: ', sum_of_inverse_degrees
+    print 'Identicals: ', identical_samples
+
+    size = ((sum_of_degrees * sum_of_inverse_degrees) /
+            (2 * identical_samples))
+
+    print 'graph size', size
+
+def collisions(sample): # broken
+    counter = 0
+    for node in sample:
+        occurrances = sample.count(node) - 1 
+        counter = counter + occurrances 
+    return counter
+
+if __name__ == "__main__":    
+    estimate_size(Graph)
 
 # TODO: add thinning?
 # def MHRW(nodes, length):
