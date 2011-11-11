@@ -10,6 +10,14 @@ node degrees).
 What do you observe?
 """
 
+""" 
+graphs: 
+  estimated size using different sampling techniques over increasing number of samples
+  compare random walks
+  effect of thinning
+  effect of burn-in
+""" 
+
 import networkx as nx
 import random
 import math
@@ -24,6 +32,7 @@ def UIS_WR(I,n):
 def UIS_WOR(I,n):
     return random.sample(I,n)
 
+# TODO: needs to take a networkx graph datastructure
 def WIS_WR(I_W):
     # From http://code.activestate.com/recipes/117241/
     # I_W is a list of (item,weight) tuples,
@@ -37,9 +46,7 @@ def WIS_WR(I_W):
     return item 
 
 def estimate_size(graph):
-    graph_sample = UIS_WR(graph.nodes(), 10000)
-    degrees = [graph.degree(node) for node in graph_sample]
-
+    degrees = [Graph.degree(node) for node in graph_sample]
     sum_of_degrees = sum(degrees)
     sum_of_inverse_degrees = sum([1.0/degree for degree in degrees])
     identical_samples = collision_count(graph_sample)
@@ -48,24 +55,29 @@ def estimate_size(graph):
     print 'Y2: ', sum_of_inverse_degrees
     print 'Identicals: ', identical_samples
 
-    size = ((sum_of_degrees * sum_of_inverse_degrees) /
-            (2 * identical_samples))
+    size = calculate_size(sum_of_degrees, 
+                          sum_of_inverse_degrees, 
+                          identical_samples)
 
-    print 'graph size', size
+    print 'Estimated graph size: ', size
+
+def calculate_size(degrees, inverse_degrees, identical_samples)
+    return ((degrees * inverse_degrees) / (2 * identical_samples))
 
 def collision_count(sample): 
-	uniques = set(sample)
-	total = [(item, sample.count(item)) for item in uniques]
-	return sum([(n*(n-1))/2 for item, n in total if n > 1])
+    uniques = set(sample)
+    total = [(item, sample.count(item)) for item in uniques]
+    return sum([(n*(n-1))/2 for item, n in total if n > 1])
 
 if __name__ == "__main__":    
     print 'original size', Graph.number_of_nodes()
-    estimate_size(Graph)
-    print collision_count([2,2,2,2,2,1,1,4,3,3,1,5,0,3])
+    graph_sample = UIS_WR(Graph.nodes(), 10000)
+    estimate_size(graph_sample)
+    estimate_size(graph_sample)
 
 
 # TODO: add thinning?
-# def MHRW(nodes, length):
+#def MHRW(nodes, length):
 #     """Metropolis-Hastings Random Walk"""
 #     first_node = random.choice(nodes)
 #     return _MHRW(length, first_node, thinning)
