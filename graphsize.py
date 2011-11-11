@@ -37,13 +37,13 @@ def WIS_WR(I_W):
     return item 
 
 def estimate_size(graph):
-    graph_sample = UIS_WR(graph, 1000)
-    degrees = [len(node) for node in graph_sample]
+    graph_sample = UIS_WR(graph.nodes(), 10000)
+    degrees = [graph.degree(node) for node in graph_sample]
 
     sum_of_degrees = sum(degrees)
-    sum_of_inverse_degrees = sum([1/degree for degree in degrees])
-    identical_samples = collisions(graph_sample)
-
+    sum_of_inverse_degrees = sum([1.0/degree for degree in degrees])
+    identical_samples = collision_count(graph_sample)
+    
     print 'Y1: ', sum_of_degrees
     print 'Y2: ', sum_of_inverse_degrees
     print 'Identicals: ', identical_samples
@@ -53,15 +53,16 @@ def estimate_size(graph):
 
     print 'graph size', size
 
-def collisions(sample): # broken
-    counter = 0
-    for node in sample:
-        occurrances = sample.count(node) - 1 
-        counter = counter + occurrances 
-    return counter
+def collision_count(sample): 
+	uniques = set(sample)
+	total = [(item, sample.count(item)) for item in uniques]
+	return sum([(n*(n-1))/2 for item, n in total if n > 1])
 
 if __name__ == "__main__":    
+    print 'original size', Graph.number_of_nodes()
     estimate_size(Graph)
+    print collision_count([2,2,2,2,2,1,1,4,3,3,1,5,0,3])
+
 
 # TODO: add thinning?
 # def MHRW(nodes, length):
