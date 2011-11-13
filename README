@@ -4,6 +4,8 @@ Lab exercise in Advanced Topics in Distributed Systems: Sampling Massive Online 
 
 Data source: http://snap.stanford.edu/data/p2p-Gnutella31.html
 
+or ./download_data.sh
+
 ---
 
 Implement formula (1) from "Estimating Sizes of Social Networks via Biased Sampling". 
