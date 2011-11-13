@@ -26,11 +26,13 @@ Graph = nx.read_edgelist("p2p-Gnutella31.txt",
                          delimiter='\t',  
                          nodetype=int)
 
-def UIS_WR(I,n):
-    return [random.choice(I) for i in xrange(n)]
+def UIS_WR(seq, n):
+    """returns n random elements from seq with replacement"""
+    return [random.choice(seq) for i in xrange(n)]
 
-def UIS_WOR(I,n):
-    return random.sample(I,n)
+def UIS_WOR(seq, n):
+    """returns n random elements from seq without replacement"""
+    return random.sample(seq, n)
 
 # TODO: needs to take a networkx graph datastructure
 def WIS_WR(I_W):
