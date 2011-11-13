@@ -29,7 +29,7 @@ class GraphSizeTest(unittest.TestCase):
         so we don't care about /0 degree error"""
         graph = nx.Graph()
         for i in xrange(5): graph.add_node(i) # nodes, no edges
-        self.assertRaises(ZeroDivisionError, graphsize.estimate_size, graph)
+        self.assertRaises(Exception, graphsize.estimate_size, graph)
 
     def test_calculate_size_arithmetic(self):
         """degrees * inverse_degrees / 2 * identical_samples"""
