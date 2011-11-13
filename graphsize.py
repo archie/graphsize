@@ -44,11 +44,19 @@ def WIS_WR(I_W):
     return item 
 
 
-def estimate_size(graph, n_samples=10000):
+def inverse_seq(seq):
+    # assuming graph is fully connected, as in given data, so ignore div 0 degree error
+    return [1.0/x for x in seq]
+
+def estimate_size(graph, n_samples=-1):
+    # determine the number of samples
+    if n_samples == -1: n_samples = graph.size() * 4
+
+    #sample the graph and process the results
     node_samples = UIS_WR(graph.nodes(), n_samples)
     degrees = [graph.degree(node) for node in node_samples]
     sum_of_degrees = sum(degrees)
-    sum_of_inverse_degrees = sum([1.0/degree for degree in degrees])     # assuming graph is fully connected, as in given data, so ignore div 0 degree error
+    sum_of_inverse_degrees = sum(inverse_seq(degrees))
 
     collisions = collision_count(node_samples)
 

@@ -36,5 +36,8 @@ class GraphSizeTest(unittest.TestCase):
         self.assertEqual(10, graphsize.calculate_size(10, 10, 5))
         self.assertEqual(100.4, graphsize.calculate_size(10, 100.4, 5))
 
+    def test_inverse_seq(self):
+        self.assertEqual([1, 2, 4, 1], graphsize.inverse_seq([1, 0.5, 0.25, 1]))
+
 if __name__ == '__main__':
     unittest.main()
