@@ -72,7 +72,7 @@ def collision_count(sample):
     total = [(item, sample.count(item)) for item in uniques]
     collisions = sum([(n*(n-1))/2 for item, n in total if n > 1])
     if collisions == 0: raise Exception("no collisions found")
-    else: return 
+    else: return collisions
 
 if __name__ == "__main__":    
     print 'original size', Graph.number_of_nodes()
