@@ -66,10 +66,13 @@ def estimate_size(graph):
 def calculate_size(degrees, inverse_degrees, identical_samples):
     return ((degrees * inverse_degrees) / (2 * identical_samples))
 
-def collision_count(sample): 
+def collision_count(sample):
+    '''counts the unique value pair sets present in sample'''
     uniques = set(sample)
     total = [(item, sample.count(item)) for item in uniques]
-    return sum([(n*(n-1))/2 for item, n in total if n > 1])
+    collisions = sum([(n*(n-1))/2 for item, n in total if n > 1])
+    if collisions == 0: raise Exception("no collisions found")
+    else: return 
 
 if __name__ == "__main__":    
     print 'original size', Graph.number_of_nodes()
