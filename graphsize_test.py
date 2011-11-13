@@ -1,6 +1,7 @@
 import graphsize
 import unittest
 import networkx as nx
+import random
 
 class GraphSizeTest(unittest.TestCase):
     def test_collision_count_raises_on_no_errors(self):
@@ -19,10 +20,14 @@ class GraphSizeTest(unittest.TestCase):
     def test_graph_size(self):
         """sanity-check graph size estmation with artificial graph data"""
         graph = nx.Graph()
-        for i in xrange(2, 5): graph.add_edge(1, i)
-        self.assertTrue(4.6 < graphsize.estimate_size(graph) < 5.4)
-        for i in xrange(6, 100): graph.add_edge(1, i)
-        self.assertTrue(95 < graphsize.estimate_size(graph) < 105)
+        # basic 5 degree-1 nodes
+        for i in xrange(2, 5): graph.add_edge(i-1, i)
+        estimate = graphsize.estimate_size(graph)
+        self.assertTrue(4 < estimate < 6, estimate)
+        # add links resulting in some degrees > 1
+        for i in xrange(6, 4000): graph.add_edge(random.randint(1,i-1), i)
+        estimate = graphsize.estimate_size(graph)
+        self.assertTrue(3900 < estimate < 4100, estimate)
 
     def test_graph_size_has_div_0_error(self):
         """the given data is a fully-connected graph (edge list) 
