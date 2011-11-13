@@ -22,10 +22,6 @@ import networkx as nx
 import random
 import math
 
-Graph = nx.read_edgelist("p2p-Gnutella31.txt",
-                         delimiter='\t',  
-                         nodetype=int)
-
 def UIS_WR(seq, n):
     """returns n random elements from seq with replacement"""
     return [random.choice(seq) for i in xrange(n)]
@@ -47,21 +43,20 @@ def WIS_WR(I_W):
         n = n - weight
     return item 
 
-def estimate_size(graph):
-    degrees = [Graph.degree(node) for node in graph_sample]
+
+def estimate_size(graph, n_samples=10000):
+    node_samples = UIS_WR(graph.nodes(), n_samples)
+    degrees = [graph.degree(node) for node in node_samples]
     sum_of_degrees = sum(degrees)
-    sum_of_inverse_degrees = sum([1.0/degree for degree in degrees])
-    identical_samples = collision_count(graph_sample)
-    
+    sum_of_inverse_degrees = sum([1.0/degree for degree in degrees])     # assuming graph is fully connected, as in given data, so ignore div 0 degree error
+
+    collisions = collision_count(node_samples)
+
     print 'Y1: ', sum_of_degrees
     print 'Y2: ', sum_of_inverse_degrees
-    print 'Identicals: ', identical_samples
+    print 'Repeated samples: ', collisions
 
-    size = calculate_size(sum_of_degrees, 
-                          sum_of_inverse_degrees, 
-                          identical_samples)
-
-    print 'Estimated graph size: ', size
+    return calculate_size(sum_of_degrees, sum_of_inverse_degrees, collisions)
 
 def calculate_size(degrees, inverse_degrees, identical_samples):
     return ((degrees * inverse_degrees) / (2 * identical_samples))
@@ -74,11 +69,28 @@ def collision_count(sample):
     if collisions == 0: raise Exception("no collisions found")
     else: return collisions
 
-if __name__ == "__main__":    
-    print 'original size', Graph.number_of_nodes()
-    graph_sample = UIS_WR(Graph.nodes(), 10000)
-    estimate_size(graph_sample)
-    estimate_size(graph_sample)
+
+def gnutella_truncated():
+    """a reduced-size graph example"""
+    graph = nx.read_edgelist("p2p-Gnutella31.truncated.txt", delimiter='\t', nodetype=int)
+    print "Running truncated Gnutella size estimate"
+    graph_size = graph.number_of_nodes()
+    samples = graph_size * 8
+    print 'original size', graph_size
+    print 'Estimated graph size ({0}): '.format(samples), estimate_size(graph, n_samples = samples)
+
+def gnutella():
+    graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
+    print "Running extended Gnutella size estimate"
+    graph_size = graph.number_of_nodes()
+    samples = graph_size * 2
+    print 'original size', graph_size
+    print 'Estimated graph size ({0}): '.format(samples), estimate_size(graph, n_samples = samples)
+
+
+if __name__ == "__main__":  
+    gnutella_truncated()
+
 
 
 # TODO: add thinning?
