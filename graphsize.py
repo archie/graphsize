@@ -63,7 +63,7 @@ def estimate_size(graph):
 
     print 'Estimated graph size: ', size
 
-def calculate_size(degrees, inverse_degrees, identical_samples)
+def calculate_size(degrees, inverse_degrees, identical_samples):
     return ((degrees * inverse_degrees) / (2 * identical_samples))
 
 def collision_count(sample): 
