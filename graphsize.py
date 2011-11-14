@@ -66,6 +66,25 @@ def estimate_size(graph, n_samples=-1):
 
     return calculate_size(sum_of_degrees, sum_of_inverse_degrees, collisions)
 
+def estimate_size_with_mhrw(graph, n_samples=-1, thinning=1, random_walk_length=20):
+    # determine the number of samples
+    if n_samples == -1: n_samples = graph.size() * 4
+
+    #sample the graph and process the results
+    node_samples = MHRW(graph, graph.nodes(), n_samples, length=random_walk_length, thinning=thinning)
+    degrees = [graph.degree(node) for node in node_samples]
+    sum_of_degrees = sum(degrees)
+    sum_of_inverse_degrees = sum(inverse_seq(degrees))
+
+    collisions = collision_count(node_samples)
+
+    print 'Sum of degrees: ', sum_of_degrees
+    print 'Sum of inverse degrees: ', sum_of_inverse_degrees
+    print 'Repeated samples: ', collisions
+
+    return calculate_size(sum_of_degrees, sum_of_inverse_degrees, collisions)
+
+
 def calculate_size(degrees, inverse_degrees, identical_samples):
     return ((degrees * inverse_degrees) / (2 * identical_samples))
 
@@ -95,31 +114,44 @@ def gnutella():
     print 'original size', graph_size
     print 'Estimated graph size ({0}): '.format(samples), estimate_size(graph, n_samples = samples)
 
+def gnutella_mhrw():
+    graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
+    print "Running extended Gnutella size estimate with MHRW sampling"
+    graph_size = graph.number_of_nodes()
+    samples = 1000
+    length = 20
+    print 'Original size: ', graph_size
+    print 'Sample size: ', samples
+    print 'Random walk length: ', length
+    estimated_size = estimate_size_with_mhrw(graph, n_samples=samples, thinning = 5, random_walk_length=length)
+    print 'Estimated graph size: ', estimated_size
 
-def MHRW(graph, sample_size, start_node=None, length=20, thinning=1):
+
+def MHRW(original_graph, graph, sample_size, start_node=None, length=20, thinning=1):
+    ''' Metropolis-Hasting Random Walk'''
     collected = []
 
     while (len(collected) <= sample_size):
         start_node = random.choice(graph) # always start at random node
-        collected = collected + do_mhrw_walk(graph, start_node, length, thinning)
+        collected = collected + do_mhrw_walk(original_graph, graph, start_node, length, thinning)
+
     # truncate if we got too many samples in walk
     if (len(collected) > sample_size):
         collected = collected[:-(len(collected) - sample_size)]
 
     return collected
 
-def do_mhrw_walk(graph, start_node, length, thinning):
+def do_mhrw_walk(original_graph, graph, start_node, length, thinning):
     collected_in_walk = []
     next_node = start_node
     current_node = start_node
-    collected_in_walk.append(start_node)
 
-    for k in range(length):
-        neighbour = graph[random.choice(current_node.keys())]
-        if (len(neighbour) < len(current_node)): 
-            next_node = current_node
+    for k in xrange(length):
+        neighbour = random.choice(original_graph[current_node].keys())
+        if (len(original_graph[neighbour]) < len(original_graph[current_node])):
+            next_node = neighbour
         else:
-            probability_of_transition = float(len(current_node)) / float(len(next_node))
+            probability_of_transition = float(len(original_graph[current_node])) / float(len(original_graph[next_node]))
             if (random.random() < probability_of_transition):
                 next_node = neighbour
             else:
@@ -136,28 +168,7 @@ def do_mhrw_walk(graph, start_node, length, thinning):
 
 if __name__ == "__main__":    
     #gnutella_truncated()
-    #print 'original size', Graph.number_of_nodes()
-    #graph_sample = UIS_WR(Graph.nodes(), 10000)
-    #estimate_size(graph_sample)
-    #estimate_size(graph_sample)
-    graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
-    print "Sample:", MHRW(graph, 20, thinning=5)
+    gnutella_mhrw()
+    #graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)    
+    #print 'mhrw: ', MHRW(graph, graph.nodes(), 5, thinning = 5)
     
-
-#def MHRW(nodes, length):
-#     """Metropolis-Hastings Random Walk"""
-#     first_node = random.choice(nodes)
-#     return _MHRW(length, first_node, thinning)
-# 
-# def _MHRW(remaining, current):
-#     if remaining > 0
-#         neighbour = random.choice(neighbours)
-#         if degree(neighbour) < degree(current)
-#             current = neighbour
-#         else
-#             probability_of_transition = (degree(current).to_float / degree(neighbour))
-#             if random(1) < probability_of_transition
-#                 current = neighbour
-#         _MHRW(length-1, current)
-#     else
-#         return current_node
