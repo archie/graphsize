@@ -22,15 +22,13 @@ import networkx as nx
 import random
 import math
 
-Graph = nx.read_edgelist("p2p-Gnutella31.txt",
-                         delimiter='\t',  
-                         nodetype=int)
+def UIS_WR(seq, n):
+    """returns n random elements from seq with replacement"""
+    return [random.choice(seq) for i in xrange(n)]
 
-def UIS_WR(I,n):
-    return [random.choice(I) for i in xrange(n)]
-
-def UIS_WOR(I,n):
-    return random.sample(I,n)
+def UIS_WOR(seq, n):
+    """returns n random elements from seq without replacement"""
+    return random.sample(seq, n)
 
 # TODO: needs to take a networkx graph datastructure
 def WIS_WR(I_W):
@@ -45,29 +43,58 @@ def WIS_WR(I_W):
         n = n - weight
     return item 
 
-def estimate_size(graph):
-    degrees = [Graph.degree(node) for node in graph_sample]
+
+def inverse_seq(seq):
+    # assuming graph is fully connected, as in given data, so ignore div 0 degree error
+    return [1.0/x for x in seq]
+
+def estimate_size(graph, n_samples=-1):
+    # determine the number of samples
+    if n_samples == -1: n_samples = graph.size() * 4
+
+    #sample the graph and process the results
+    node_samples = UIS_WR(graph.nodes(), n_samples)
+    degrees = [graph.degree(node) for node in node_samples]
     sum_of_degrees = sum(degrees)
-    sum_of_inverse_degrees = sum([1.0/degree for degree in degrees])
-    identical_samples = collision_count(graph_sample)
-    
+    sum_of_inverse_degrees = sum(inverse_seq(degrees))
+
+    collisions = collision_count(node_samples)
+
     print 'Y1: ', sum_of_degrees
     print 'Y2: ', sum_of_inverse_degrees
-    print 'Identicals: ', identical_samples
+    print 'Repeated samples: ', collisions
 
-    size = calculate_size(sum_of_degrees, 
-                          sum_of_inverse_degrees, 
-                          identical_samples)
-
-    print 'Estimated graph size: ', size
+    return calculate_size(sum_of_degrees, sum_of_inverse_degrees, collisions)
 
 def calculate_size(degrees, inverse_degrees, identical_samples):
     return ((degrees * inverse_degrees) / (2 * identical_samples))
 
-def collision_count(sample): 
+def collision_count(sample):
+    '''counts the unique value pair sets present in sample'''
     uniques = set(sample)
     total = [(item, sample.count(item)) for item in uniques]
-    return sum([(n*(n-1))/2 for item, n in total if n > 1])
+    collisions = sum([(n*(n-1))/2 for item, n in total if n > 1])
+    if collisions == 0: raise Exception("no collisions found")
+    else: return collisions
+
+
+def gnutella_truncated():
+    """a reduced-size graph example"""
+    graph = nx.read_edgelist("p2p-Gnutella31.truncated.txt", delimiter='\t', nodetype=int)
+    print "Running truncated Gnutella size estimate"
+    graph_size = graph.number_of_nodes()
+    samples = graph_size * 8
+    print 'original size', graph_size
+    print 'Estimated graph size ({0}): '.format(samples), estimate_size(graph, n_samples = samples)
+
+def gnutella():
+    graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
+    print "Running extended Gnutella size estimate"
+    graph_size = graph.number_of_nodes()
+    samples = graph_size * 2
+    print 'original size', graph_size
+    print 'Estimated graph size ({0}): '.format(samples), estimate_size(graph, n_samples = samples)
+
 
 def MHRW(sample_size, start_node=None, length=20, thinning=1):
     collected = []
@@ -98,6 +125,7 @@ def do_mhrw_walk(start_node, length, thinning):
 
 
 if __name__ == "__main__":    
+    gnutella_truncated()
     #print 'original size', Graph.number_of_nodes()
     #graph_sample = UIS_WR(Graph.nodes(), 10000)
     #estimate_size(graph_sample)
