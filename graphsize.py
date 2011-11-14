@@ -21,6 +21,7 @@ graphs:
 import networkx as nx
 import random
 import math
+from multiprocessing import Process, Queue
 
 def UIS_WR(seq, n):
     """returns n random elements from seq with replacement"""
@@ -43,31 +44,54 @@ def WIS_WR(I_W):
         n = n - weight
     return item 
 
-
-def inverse_seq(seq):
-    # assuming graph is fully connected, as in given data, so ignore div 0 degree error
-    return [1.0/x for x in seq]
-
 def estimate_size(graph, n_samples=-1):
     # determine the number of samples
     if n_samples == -1: n_samples = graph.size() * 4
 
-    #sample the graph and process the results
-    node_samples = UIS_WR(graph.nodes(), n_samples)
-    degrees = [graph.degree(node) for node in node_samples]
-    sum_of_degrees = sum(degrees)
-    sum_of_inverse_degrees = sum(inverse_seq(degrees))
+    stride_length = 10000
+    strides = (n_samples / stride_length) + 1
+    results = Queue()
 
-    collisions = collision_count(node_samples)
+    for step in xrange(0, strides):
+        stride(graph, stride_length, results)
 
-    print 'Y1: ', sum_of_degrees
-    print 'Y2: ', sum_of_inverse_degrees
+    degree_sum = 0
+    inverse_degree_sum = 0
+    collisions = 0
+    
+    for step in xrange(0, strides):
+        result = results.get(block = True, timeout = 30)
+        degree_sum += result['degree_sum']
+        inverse_degree_sum += result['inverse_degree_sum']
+        collisions += result['collisions']
+
+    print ''
+    print 'Y1 sum of degrees: ', degree_sum
+    print 'Y2 sum of inverse degrees: ', inverse_degree_sum
     print 'Repeated samples: ', collisions
+    
+    return calculate_size(degree_sum, inverse_degree_sum, collisions)
 
-    return calculate_size(sum_of_degrees, sum_of_inverse_degrees, collisions)
+def stride(graph, stride_length, result_queue):
+    """one subsampling of the graph; 
+    returns [sum_of_degrees, sum_of_inverse_degrees, collisions]
+    """
+    #sample the graph and process the results
+    node_samples = UIS_WR(graph.nodes(), stride_length)
+    degrees = [graph.degree(node) for node in node_samples]
+    result_queue.put({
+        'degree_sum': sum(degrees), 
+        'inverse_degree_sum': sum(inverse_seq(degrees)), 
+        'collisions': collision_count(node_samples)
+    })
+
 
 def calculate_size(degrees, inverse_degrees, identical_samples):
     return ((degrees * inverse_degrees) / (2 * identical_samples))
+
+def inverse_seq(seq):
+    # assuming graph is fully connected, as in given data, so ignore div 0 degree error
+    return [1.0/x for x in seq]
 
 def collision_count(sample):
     '''counts the unique value pair sets present in sample'''
@@ -85,7 +109,8 @@ def gnutella_truncated():
     graph_size = graph.number_of_nodes()
     samples = graph_size * 8
     print 'original size', graph_size
-    print 'Estimated graph size ({0}): '.format(samples), estimate_size(graph, n_samples = samples)
+    print 'Estimated graph size ({0} samples): '.format(samples)
+    print estimate_size(graph, n_samples = samples)
 
 def gnutella():
     graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
@@ -93,7 +118,8 @@ def gnutella():
     graph_size = graph.number_of_nodes()
     samples = graph_size * 2
     print 'original size', graph_size
-    print 'Estimated graph size ({0}): '.format(samples), estimate_size(graph, n_samples = samples)
+    print 'Estimated graph size ({0} samples): '.format(samples)
+    print estimate_size(graph, n_samples = samples)
 
 
 if __name__ == "__main__":  

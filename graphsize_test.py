@@ -22,12 +22,12 @@ class GraphSizeTest(unittest.TestCase):
         graph = nx.Graph()
         # basic 5 degree-1 nodes
         for i in xrange(2, 5): graph.add_edge(i-1, i)
-        estimate = graphsize.estimate_size(graph)
+        estimate = graphsize.estimate_size(graph, 5000)
         self.assertTrue(4 < estimate < 6, estimate)
         # add links resulting in some degrees > 1
-        for i in xrange(6, 4000): graph.add_edge(random.randint(1,i-1), i)
-        estimate = graphsize.estimate_size(graph)
-        self.assertTrue(3900 < estimate < 4100, estimate)
+        for i in xrange(6, 10000): graph.add_edge(random.randint(1,i-1), i)
+        estimate = graphsize.estimate_size(graph, 40000)
+        self.assertTrue(9900 < estimate < 11000, estimate)
 
     def test_graph_size_has_div_0_error(self):
         """the given data is a fully-connected graph (edge list) 
