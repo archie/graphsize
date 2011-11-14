@@ -90,12 +90,15 @@ def calculate_size(degrees, inverse_degrees, identical_samples):
 
 def collision_count(sample):
     '''counts the unique value pair sets present in sample'''
-    uniques = set(sample)
-    total = [(item, sample.count(item)) for item in uniques]
+    total = bin_samples(sample)
     collisions = sum([(n*(n-1))/2 for item, n in total if n > 1])
     if collisions == 0: raise Exception("no collisions found")
     else: return collisions
 
+def bin_samples(samples):
+    """produces a histogram-like bin of sample occurence counts"""
+    uniques = set(samples)
+    total = [(item, sample.count(item)) for item in uniques]
 
 def MHRW(original_graph, graph, sample_size, start_node=None, length=20, thinning=1):
     ''' Metropolis-Hasting Random Walk'''
