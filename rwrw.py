@@ -6,8 +6,8 @@ import graphsize
 def RWRW(graph, sample_size, start_node=None, length=20, thinning=1):
     collected = []
     while (len(collected) <= sample_size):
-        start_node = random.choice(graph).keys()[0] # always start at random node
-        collected += classic_random_walk(graph, start_node, length, thinning)
+        start_node = 0 # always start at the same node
+        collected += classic_random_walk(graph, graph.nodes(), start_node, length, thinning)
 
     # truncate to requested sample length
     if (len(collected) > sample_size):
@@ -15,7 +15,7 @@ def RWRW(graph, sample_size, start_node=None, length=20, thinning=1):
 
     return reweight_sample(collected, graph)
 
-def classic_random_walk(graph, start_node, length, thinning=1):
+def classic_random_walk(original_graph, graph, start_node, length, thinning=1):
     '''
     returns the uncompensated (biased) random walk path, with optional thinning
     start_node should be the node key (id), not node hash
@@ -23,7 +23,7 @@ def classic_random_walk(graph, start_node, length, thinning=1):
     collected_in_walk = []
     current_node = start_node
     for k in range(length):
-        current_node = random.choice(graph[current_node].keys())
+        current_node = random.choice(original_graph[current_node].keys())
         # only store every k value
         if (k % thinning) == 0:
             collected_in_walk.append(current_node)
@@ -33,12 +33,13 @@ def hh_node_weight(graph, node, occurrences, sum_of_inverse_degrees):
     return (occurrences / graph.degree(node)) / sum_of_inverse_degrees
 
 def reweight_sample(samples, graph):
-    print samples
+#    print samples
     degrees = [graph.degree(node) for node in samples]
     sum_of_inverse_degrees = sum(graphsize.inverse_seq(degrees))
     num_samples = len(samples)
     binned_samples = graphsize.bin_samples(samples)
-    print binned_samples
+
+    #print binned_samples
     
     # create a dict of p values for each element in the bin
     #       i.e. {0.2: 1, 0.4: 3, :0.5: 2, ...}
@@ -46,24 +47,30 @@ def reweight_sample(samples, graph):
         # sample the samples using the HH estimator reweighting
         # i.e. find the first key in the dict greater than random.random
         #       and add its value to results
-    sample_prob_distr = dict([
+    sample_probability_distribution = dict([
         # TODO This doesn't work, it needs to increment the previous p value by its own value;
         #  and we must make sure the first is > 0 and the last is < 1
         (hh_node_weight(graph, node, occurrences, sum_of_inverse_degrees), node)
         for [node, occurrences] in binned_samples
     ])
 
+    print sample_probability_distribution
+
     results = []
     for sample in xrange(num_samples):
         rand = random.random() # once per sample
-        for prob in sample_prob_distr.keys() #TODO: sorting needed? reversed(sorted(sample_prob_distr.keys())):
+
+        #TODO: sorting needed? reversed(sorted(sample_prob_distr.keys())):
+        sorted_prob = sample_probability_distribution.keys()
+        sorted_prob.sort()
+        for prob in sorted_prob:
             if rand < prob:
-                node = sample_prob_distr[prob]
+                node = sample_probability_distribution[prob]
                 results.append(node)
-                print "adding to result: ", node
                 break #out of for loop over prob distr
+
     return results
 
 if __name__ == "__main__":    
     graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
-    print "Sample:", RWRW(graph, 20, thinning=5)
+    print "Sample:", RWRW(graph, 100, thinning=5)
