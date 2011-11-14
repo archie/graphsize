@@ -6,7 +6,7 @@ import graphsize
 def RWRW(graph, sample_size, start_node=None, length=20, thinning=1):
     collected = []
     while (len(collected) <= sample_size):
-        start_node = random.choice(graph) # always start at random node
+        start_node = random.choice(graph).keys()[0] # always start at random node
         collected += classic_random_walk(graph, start_node, length, thinning)
 
     # truncate to requested sample length
@@ -16,18 +16,20 @@ def RWRW(graph, sample_size, start_node=None, length=20, thinning=1):
     return reweight_sample(collected, graph)
 
 def classic_random_walk(graph, start_node, length, thinning=1):
-    '''returns the uncompensated (biased) random walk path, with optional thinning'''
+    '''
+    returns the uncompensated (biased) random walk path, with optional thinning
+    start_node should be the node key (id), not node hash
+    '''
     collected_in_walk = []
     current_node = start_node
     for k in range(length):
-        #  TODO : this doesnt work, need to decrypt nx api and fix
-        current_node = random.choice(current_node.keys())
+        current_node = random.choice(graph[current_node].keys())
         # only store every k value
         if (k % thinning) == 0:
             collected_in_walk.append(current_node)
     return collected_in_walk
 
-def hh_node_weight(graph, node, occurences, sum_of_inverse_degrees):
+def hh_node_weight(graph, node, occurrences, sum_of_inverse_degrees):
     return (occurrences / graph.degree(node)) / sum_of_inverse_degrees
 
 def reweight_sample(samples, graph):
@@ -36,6 +38,7 @@ def reweight_sample(samples, graph):
     sum_of_inverse_degrees = sum(graphsize.inverse_seq(degrees))
     num_samples = len(samples)
     binned_samples = graphsize.bin_samples(samples)
+    print binned_samples
     
     # create a dict of p values for each element in the bin
     #       i.e. {0.2: 1, 0.4: 3, :0.5: 2, ...}
@@ -44,18 +47,22 @@ def reweight_sample(samples, graph):
         # i.e. find the first key in the dict greater than random.random
         #       and add its value to results
     sample_prob_distr = dict([
-        (hh_node_weight(graph, node, occurences, sum_of_inverse_degrees), node)
-        for [node, occurrences] in samples
+        # TODO This doesn't work, it needs to increment the previous p value by its own value;
+        #  and we must make sure the first is > 0 and the last is < 1
+        (hh_node_weight(graph, node, occurrences, sum_of_inverse_degrees), node)
+        for [node, occurrences] in binned_samples
     ])
 
     results = []
     for sample in xrange(num_samples):
         rand = random.random() # once per sample
-        for prob, node in sorted(sample_prob_distr):
-            if rand < prob: 
-                results += node
+        for prob in sample_prob_distr.keys() #TODO: sorting needed? reversed(sorted(sample_prob_distr.keys())):
+            if rand < prob:
+                node = sample_prob_distr[prob]
+                results.append(node)
+                print "adding to result: ", node
                 break #out of for loop over prob distr
-
+    return results
 
 if __name__ == "__main__":    
     graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
