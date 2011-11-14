@@ -61,7 +61,7 @@ def estimate_size(graph):
 
     print 'Estimated graph size: ', size
 
-def calculate_size(degrees, inverse_degrees, identical_samples)
+def calculate_size(degrees, inverse_degrees, identical_samples):
     return ((degrees * inverse_degrees) / (2 * identical_samples))
 
 def collision_count(sample): 
@@ -69,14 +69,42 @@ def collision_count(sample):
     total = [(item, sample.count(item)) for item in uniques]
     return sum([(n*(n-1))/2 for item, n in total if n > 1])
 
+def MHRW(sample_size, start_node=None, length=20, thinning=1):
+    collected = []
+
+    while (len(collected) <= sample_size):
+        start_node = random.choice(Graph) # always start at random node
+        collected = collected + do_mhrw_walk(start_node, length, thinning)
+
+    if (len(collected) > sample_size):
+        collected = collected[:-len(collected) - sample_size]
+
+    return collected
+
+def do_mhrw_walk(start_node, length, thinning):
+    collected_in_walk = []
+    current_node = start_node
+    collected_in_walk.append(current_node)
+
+    for x in range(length):
+        print current_node
+        neighbours = Graph[current_node].nodes()
+        next_node = random.choice(neighbours)
+        current_node = next_node
+        if (x % thinning) == 0:
+            collected_in_walk.append(next_node)
+
+    return collected_in_walk
+
+
 if __name__ == "__main__":    
-    print 'original size', Graph.number_of_nodes()
-    graph_sample = UIS_WR(Graph.nodes(), 10000)
-    estimate_size(graph_sample)
-    estimate_size(graph_sample)
+    #print 'original size', Graph.number_of_nodes()
+    #graph_sample = UIS_WR(Graph.nodes(), 10000)
+    #estimate_size(graph_sample)
+    #estimate_size(graph_sample)
+    print "Sample:", MHRW(10)
+    
 
-
-# TODO: add thinning?
 #def MHRW(nodes, length):
 #     """Metropolis-Hastings Random Walk"""
 #     first_node = random.choice(nodes)
