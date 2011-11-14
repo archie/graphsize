@@ -160,6 +160,7 @@ def gnutella_mhrw(samples, length, thinning):
     print 'Original size: ', graph_size
     print 'Sample size: ', samples
     print 'Random walk length: ', length
+    print 'Thinning used: ', thinning
     estimated_size = estimate_size_with_mhrw(graph, n_samples=samples, thinning = thinning, random_walk_length=length)
     print 'Estimated graph size: ', estimated_size
     return estimated_size

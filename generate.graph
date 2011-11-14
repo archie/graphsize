@@ -1,0 +1,45 @@
+#!/usr/bin/gnuplot
+
+reset
+set terminal png
+
+# size
+set output "samplesize.png"
+set xlabel "Sample size"
+set xtics 5000
+
+set ylabel "Estimated graph size"
+set grid
+set style data linespoints
+
+set title "Accuracy with sample size"
+
+plot "sample_size.data" using 1:2 
+
+
+# walk
+set output "walk.png"
+set xlabel "Random Walk length"
+set xtics 5000
+
+set ylabel "Estimated graph size"
+set grid
+set style data linespoints
+
+set title "Affect of length of random walk"
+
+plot "walk.data" using 1:2 
+
+
+# thinning
+set output "thinning.png"
+set xlabel "Thinning"
+set xtics 5000
+
+set ylabel "Estimated graph size"
+set grid
+set style data linespoints
+
+set title "Affect of thinning"
+
+plot "thinning.data" using 1:2 
