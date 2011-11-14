@@ -45,7 +45,7 @@ def WIS_WR(I_W):
 
 
 def inverse_seq(seq):
-    # assuming graph is fully connected, as in given data, so ignore div 0 degree error
+    # assuming graph has no disconnected nodes, as in given data, so ignore div 0 degree error
     return [1.0/x for x in seq]
 
 def estimate_size(graph, n_samples=-1):
