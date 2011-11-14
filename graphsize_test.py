@@ -44,5 +44,8 @@ class GraphSizeTest(unittest.TestCase):
     def test_inverse_seq(self):
         self.assertEqual([1, 2, 4, 1], graphsize.inverse_seq([1, 0.5, 0.25, 1]))
 
+    def test_mhrw_walk(self):
+        self.assertEqual(1,1)
+
 if __name__ == '__main__':
     unittest.main()

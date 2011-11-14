@@ -96,41 +96,52 @@ def gnutella():
     print 'Estimated graph size ({0}): '.format(samples), estimate_size(graph, n_samples = samples)
 
 
-def MHRW(sample_size, start_node=None, length=20, thinning=1):
+def MHRW(graph, sample_size, start_node=None, length=20, thinning=1):
     collected = []
 
     while (len(collected) <= sample_size):
-        start_node = random.choice(Graph) # always start at random node
-        collected = collected + do_mhrw_walk(start_node, length, thinning)
-
+        start_node = random.choice(graph) # always start at random node
+        collected = collected + do_mhrw_walk(graph, start_node, length, thinning)
+    # truncate if we got too many samples in walk
     if (len(collected) > sample_size):
-        collected = collected[:-len(collected) - sample_size]
+        collected = collected[:-(len(collected) - sample_size)]
 
     return collected
 
-def do_mhrw_walk(start_node, length, thinning):
+def do_mhrw_walk(graph, start_node, length, thinning):
     collected_in_walk = []
+    next_node = start_node
     current_node = start_node
-    collected_in_walk.append(current_node)
+    collected_in_walk.append(start_node)
 
-    for x in range(length):
-        print current_node
-        neighbours = Graph[current_node].nodes()
-        next_node = random.choice(neighbours)
-        current_node = next_node
-        if (x % thinning) == 0:
+    for k in range(length):
+        neighbour = graph[random.choice(current_node.keys())]
+        if (len(neighbour) < len(current_node)): 
+            next_node = current_node
+        else:
+            probability_of_transition = float(len(current_node)) / float(len(next_node))
+            if (random.random() < probability_of_transition):
+                next_node = neighbour
+            else:
+                next_node = current_node
+
+        # only store every k value
+        if (k % thinning) == 0:
             collected_in_walk.append(next_node)
+
+        current_node = next_node
 
     return collected_in_walk
 
 
 if __name__ == "__main__":    
-    gnutella_truncated()
+    #gnutella_truncated()
     #print 'original size', Graph.number_of_nodes()
     #graph_sample = UIS_WR(Graph.nodes(), 10000)
     #estimate_size(graph_sample)
     #estimate_size(graph_sample)
-    print "Sample:", MHRW(10)
+    graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
+    print "Sample:", MHRW(graph, 20, thinning=5)
     
 
 #def MHRW(nodes, length):
