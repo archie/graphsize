@@ -105,7 +105,8 @@ def MHRW(original_graph, graph, sample_size, start_node=None, length=20, thinnin
     collected = []
 
     while (len(collected) <= sample_size):
-        start_node = random.choice(graph) # always start at random node
+        start_node = graph[0] # always start at the same node
+#        start_node = random.choice(graph) # always start at random node
         collected = collected + do_mhrw_walk(original_graph, graph, start_node, length, thinning)
 
     # truncate if we got too many samples in walk
@@ -172,6 +173,4 @@ def gnutella_mhrw(samples, length, thinning):
 if __name__ == "__main__":    
     print 'hej'
 
-    #graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)    
-    #print 'mhrw: ', MHRW(graph, graph.nodes(), 5, thinning = 5)
-    
+    print gnutella_mhrw(10000, 600, 5)
