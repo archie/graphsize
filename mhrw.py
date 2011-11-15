@@ -59,10 +59,9 @@ def estimate_size_with_mhrw(graph, n_samples=-1, thinning=1, random_walk_length=
     return graphsize.estimate_size(sum_of_degrees, sum_of_inverse_degrees, collisions)
 
 def gnutella_mhrw(samples, length, thinning):
-    graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
     print "Running extended Gnutella size estimate with MHRW sampling"
-    graph_size = graph.number_of_nodes()
-    print 'Original size: ', graph_size
+    graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
+    print 'Original size: ', graph.number_of_nodes()
     print 'Sample size: ', samples
     print 'Random walk length: ', length
     print 'Thinning used: ', thinning
@@ -71,5 +70,5 @@ def gnutella_mhrw(samples, length, thinning):
     return estimated_size
 
 if __name__ == "__main__":    
-    print gnutella_mhrw(10000, 600, 5)
+    print gnutella_mhrw(10000, 300, 10)
 

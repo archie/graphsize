@@ -13,6 +13,7 @@ def wis_wr_size_estimate(graph, n_samples=-1):
     return graphsize.estimate_size(sum_of_degrees, sum_of_inverse_degrees, collisions)
 
 def sample():
+    """run a WIS_WR sample and print the results to a file for plotting"""
     graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
     collected = {}
     for size in xrange(0, 30001, 5000):

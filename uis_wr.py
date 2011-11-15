@@ -19,6 +19,7 @@ def uis_wr_size_estimate(graph, n_samples=-1):
     return graphsize.estimate_size(sum_of_degrees, sum_of_inverse_degrees, collisions)
 
 def sample():
+    """run a UIS_WR sample and print the results to a file for plotting"""
     graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
     collected = {}
     for size in xrange(0, 30001, 5000):
@@ -33,9 +34,3 @@ def sample():
 
 if __name__ == "__main__":    
     sample()
-    #graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
-    #print "Running extended Gnutella size estimate"
-    #samples = 10000
-    #print 'original size', graph.number_of_nodes()
-    #print 'Estimated graph size ({0} samples): '.format(samples)
-    #print uis_wr_size_estimate(graph, n_samples = samples)
