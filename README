@@ -2,21 +2,31 @@ Lab exercise in Advanced Topics in Distributed Systems: Sampling Massive Online 
 
 ---
 
-Data source: http://snap.stanford.edu/data/p2p-Gnutella31.html
-
-or ./download_data.sh
+Data source
+- http://snap.stanford.edu/data/p2p-Gnutella31.html 
+- or ./download_data.sh 
 
 ---
 
-Implement formula (1) from "Estimating Sizes of Social Networks via Biased Sampling". 
+Exercise
 
-Apply it to nodes collected by:
-(a) UIS WOR, 
-(b) UIS WR, 
-(c) WIS WR (with weights equal to node degrees), 
-(d) RW (using all nodes, or every k-th node; the weights are node degrees). 
+Implement graph size estimation using the following sampling techniques:
+(a) Uniform Independent Sample Without Replacement, 
+(b) Uniform Independent Sample With Replacement, 
+(c) Weighted Independent Sample With Replacement (with weights equal to node degrees), 
+(d) Random Walk (Metropolis-Hastings and Reweighted)
+    1) using all nodes, 
+    2) every k-th node,
+    3) the weights are node degrees 
 
 What do you observe?
+
+---
+
+Requirements
+1) Python
+2) networkx (easy_install networkx)
+3) gnuplot
 
 ---
 
@@ -31,3 +41,7 @@ UIS_WR and WIS_WR samples are self-contained. Run as:
 RWRW is broken. 
 
 ---  
+
+Generate graphs
+
+Run 'gnuplot generate.graph' to create some (good looking) graphs.
