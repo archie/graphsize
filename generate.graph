@@ -16,7 +16,8 @@ set title "Accuracy with sample size"
 
 plot "sample_size.data" using 1:2 title "MHRW", \
      "uis_wr.data" using 1:2 title "UIS_WR", \
-     "wis_wr.data" using 1:2 title "WIS_WR"
+     "wis_wr.data" using 1:2 title "WIS_WR", \
+     62586 title "true value"
 
 
 # walk
