@@ -13,7 +13,7 @@ def RWRW(graph, sample_size, start_node=None, length=20, thinning=1):
     if (len(collected) > sample_size):
         collected = collected[:-(len(collected) - sample_size)]
 
-    return reweight_sample(collected, graph)
+    return reweighted_sample(collected, graph)
 
 def classic_random_walk(original_graph, graph, start_node, length, thinning=1):
     '''
@@ -29,48 +29,40 @@ def classic_random_walk(original_graph, graph, start_node, length, thinning=1):
             collected_in_walk.append(current_node)
     return collected_in_walk
 
-def hh_node_weight(graph, node, occurrences, sum_of_inverse_degrees):
-    return (occurrences / graph.degree(node)) / sum_of_inverse_degrees
-
-def reweight_sample(samples, graph):
-#    print samples
+def reweighted_sample(samples, graph):
     degrees = [graph.degree(node) for node in samples]
     sum_of_inverse_degrees = sum(graphsize.inverse_seq(degrees))
     num_samples = len(samples)
     binned_samples = graphsize.bin_samples(samples)
-
-    #print binned_samples
-    
-    # create a dict of p values for each element in the bin
-    #       i.e. {0.2: 1, 0.4: 3, :0.5: 2, ...}
-    # for sample in xrange(num_samples):
-        # sample the samples using the HH estimator reweighting
-        # i.e. find the first key in the dict greater than random.random
-        #       and add its value to results
-    sample_probability_distribution = dict([
-        # TODO This doesn't work, it needs to increment the previous p value by its own value;
-        #  and we must make sure the first is > 0 and the last is < 1
-        (hh_node_weight(graph, node, occurrences, sum_of_inverse_degrees), node)
+    # print "original sample bins", binned_samples
+    # reuse the WIS_WR probability distribution sampling method
+    # create a tuple list of nodes and weights for each bin element
+    #       i.e. [(1, 0.2), (3, 0.4), (2, 0.5) ...}
+    hh_weighted_nodes = [
+        (node, 
+        graphsize.hh_node_weight(graph.degree(node), occurrences, sum_of_inverse_degrees)
+        ) 
         for [node, occurrences] in binned_samples
-    ])
+    ]
+    new_samples = graphsize.WIS_WR(hh_weighted_nodes, num_samples)
+    # print "reweighted sample bins", graphsize.bin_samples(new_samples)
+    return new_samples
 
-    print sample_probability_distribution
-
-    results = []
-    for sample in xrange(num_samples):
-        rand = random.random() # once per sample
-
-        #TODO: sorting needed? reversed(sorted(sample_prob_distr.keys())):
-        sorted_prob = sample_probability_distribution.keys()
-        sorted_prob.sort()
-        for prob in sorted_prob:
-            if rand < prob:
-                node = sample_probability_distribution[prob]
-                results.append(node)
-                break #out of for loop over prob distr
-
-    return results
+def rwrw_size_estimate(graph, n_samples=-1, walk_length=200, thinning=40):
+    # determine the number of samples
+    if n_samples == -1: n_samples = graph.size() * 2
+    samples = RWRW(graph, n_samples, length=walk_length, thinning=thinning)
+    node_degrees = [graph.degree(node) for node in samples]
+    sum_of_degrees = sum(node_degrees)
+    sum_of_inverse_degrees = sum(graphsize.inverse_seq(node_degrees))
+    collisions = graphsize.collision_count(samples)
+    return graphsize.estimate_size(sum_of_degrees, sum_of_inverse_degrees, collisions)
 
 if __name__ == "__main__":    
     graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
-    print "Sample:", RWRW(graph, 100, thinning=5)
+    print "Running extended Gnutella size estimate"
+    samples = 10000
+    print 'original size', graph.number_of_nodes()
+    print 'Estimated graph size ({0} samples): '.format(samples)
+    print rwrw_size_estimate(graph, n_samples = samples, walk_length=10000, thinning=100)
+

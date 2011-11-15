@@ -68,5 +68,11 @@ def WIS_WR(I_W, n_samples=1):
         samples.append(item)
     return samples
 
+def hh_node_weight(degree, occurrences, sum_of_inverse_degrees):
+    '''
+    Hansen-Hurwitz estimator of node probability
+    '''
+    return (float(occurrences) / float(degree)) / float(sum_of_inverse_degrees)
+
 if __name__ == "__main__":    
     print "nothing to see here, run another file"
