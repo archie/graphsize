@@ -22,7 +22,7 @@ plot "sample_size.data" using 1:2 title "MHRW", \
 # walk
 set output "walk.png"
 set xlabel "Random Walk length"
-set xtics 600
+set xtics auto
 
 set ylabel "Estimated graph size"
 set grid
@@ -36,7 +36,7 @@ plot "walk.data" using 1:2
 # thinning
 set output "thinning.png"
 set xlabel "Thinning"
-set xtics 100
+set xtics 10
 
 set ylabel "Estimated graph size"
 set grid
