@@ -19,3 +19,15 @@ Apply it to nodes collected by:
 What do you observe?
 
 ---
+
+Where to start?
+
+Each sampling technique is contained in its own file (except UIS_WOR which doesn't make sense since there wont be any collisions). For example, to start a full MHRW sample run: 
+     python mhrw_sample.py
+
+UIS_WR and WIS_WR samples are self-contained. Run as:
+     python uis_wr.py or python wis_wr.py
+
+RWRW is broken. 
+
+---  
