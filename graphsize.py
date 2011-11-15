@@ -1,11 +1,11 @@
 """
 Implement formula (1) from "Estimating Sizes of Social Networks 
 via Biased Sampling". Apply it to nodes collected by:
-(a) UIS WOR, 
-(b) UIS WR, 
-(c) WIS WR (with weights equal to node degrees), 
+(a) UIS WOR, -- impossible, no collisions
+(b) UIS WR, TODO: fix
+(c) WIS WR (with weights equal to node degrees), TODO: implement
 (d) RW (using all nodes, or every k-th node; the weights are 
-node degrees). 
+node degrees). TODO: fix
 
 What do you observe?
 """
