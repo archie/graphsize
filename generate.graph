@@ -15,9 +15,10 @@ set style data linespoints
 set title "Accuracy with sample size"
 
 plot "sample_size.data" using 1:2 title "MHRW", \
+     "rwrw_size.data" using 1:2 title "RWRW", \
      "uis_wr.data" using 1:2 title "UIS_WR", \
      "wis_wr.data" using 1:2 title "WIS_WR", \
-     62586 title "true value"
+     62586 title "true size"
 
 
 # walk
@@ -31,13 +32,14 @@ set style data linespoints
 
 set title "Affect of length of random walk"
 
-plot "walk.data" using 1:2 
+plot "walk.data" using 1:2 title "MHRW", \
+     "rwrw_walk.data" using 1:2 title "RWRW"
 
 
 # thinning
 set output "thinning.png"
 set xlabel "Thinning"
-set xtics 10
+set xtics auto
 
 set ylabel "Estimated graph size"
 set grid
@@ -45,4 +47,6 @@ set style data linespoints
 
 set title "Affect of thinning"
 
-plot "thinning.data" using 1:2 
+plot "mhrw_thinning_2.data" using 1:2 title "MHRW",\
+     62586 title "true size"
+#     "rwrw_thinning.data" using 1:2 title "RWRW"

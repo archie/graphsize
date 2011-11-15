@@ -1,6 +1,6 @@
 import networkx as nx
 import random
-
+import graphsize
 
 def MHRW(original_graph, graph, sample_size, start_node=None, length=20, thinning=1):
     ''' Metropolis-Hasting Random Walk'''
@@ -34,7 +34,7 @@ def do_mhrw_walk(original_graph, graph, start_node, length, thinning):
                 next_node = current_node
 
         # only store every k value
-        if (k % thinning) == 0:
+        if (k % thinning) == thinning-1:
             collected_in_walk.append(next_node)
 
         current_node = next_node
@@ -49,15 +49,15 @@ def estimate_size_with_mhrw(graph, n_samples=-1, thinning=1, random_walk_length=
     node_samples = MHRW(graph, graph.nodes(), n_samples, length=random_walk_length, thinning=thinning)
     degrees = [graph.degree(node) for node in node_samples]
     sum_of_degrees = sum(degrees)
-    sum_of_inverse_degrees = sum(inverse_seq(degrees))
+    sum_of_inverse_degrees = sum(graphsize.inverse_seq(degrees))
 
-    collisions = collision_count(node_samples)
+    collisions = graphsize.collision_count(node_samples)
 
     print 'Sum of degrees: ', sum_of_degrees
     print 'Sum of inverse degrees: ', sum_of_inverse_degrees
     print 'Repeated samples: ', collisions
 
-    return estimate_size(sum_of_degrees, sum_of_inverse_degrees, collisions)
+    return graphsize.estimate_size(sum_of_degrees, sum_of_inverse_degrees, collisions)
 
 def gnutella_mhrw(samples, length, thinning):
     graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
