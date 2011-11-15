@@ -3,6 +3,8 @@ import random
 import math
 import graphsize
 
+""" This implementation of Reweighted Random Walk doesn't really work. You've been warned."""
+
 def RWRW(graph, sample_size, start_node=None, length=20, thinning=1):
     collected = []
     while (len(collected) <= sample_size):
@@ -58,11 +60,14 @@ def rwrw_size_estimate(graph, n_samples=-1, walk_length=200, thinning=40):
     collisions = graphsize.collision_count(samples)
     return graphsize.estimate_size(sum_of_degrees, sum_of_inverse_degrees, collisions)
 
-if __name__ == "__main__":    
+def sample():
     graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
-    print "Running extended Gnutella size estimate"
+    print "Running graph size estimate using RWRW on Gnutella"
     samples = 10000
     print 'original size', graph.number_of_nodes()
     print 'Estimated graph size ({0} samples): '.format(samples)
     print rwrw_size_estimate(graph, n_samples = samples, walk_length=10000, thinning=100)
+
+if __name__ == "__main__":    
+    sample()
 
