@@ -49,6 +49,6 @@ set style data linespoints
 
 set title "Affect of thinning"
 
-plot "mhrw_thinning_2.data" using 1:2 title "MHRW",\
-     "rwrw_thinning.data" using 1:2 title "RWRW"
+plot "mhrw_thinning.data" using 1:2 title "MHRW",\
+     "rwrw_thinning.data" using 1:2 title "RWRW",\
      62586 title "true size"
