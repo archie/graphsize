@@ -14,7 +14,7 @@ set style data linespoints
 
 set title "Accuracy with sample size"
 
-plot "sample_size.data" using 1:2 title "MHRW", \
+plot "mhrw_size.data" using 1:2 title "MHRW", \
      "rwrw_size.data" using 1:2 title "RWRW", \
      "uis_wr.data" using 1:2 title "UIS_WR", \
      "wis_wr.data" using 1:2 title "WIS_WR", \

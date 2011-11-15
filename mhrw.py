@@ -8,7 +8,6 @@ def MHRW(original_graph, graph, sample_size, start_node=None, length=20, thinnin
 
     while (len(collected) <= sample_size):
         start_node = graph[0] # always start at the same node
-#        start_node = random.choice(graph) # always start at random node
         collected = collected + do_mhrw_walk(original_graph, graph, start_node, length, thinning)
 
     # truncate if we got too many samples in walk
