@@ -23,17 +23,19 @@ def sample():
     collected = {}
     for size in xrange(0, 30001, 5000):
         if size == 0: continue
-        collected[size] = run(3, uis_wr_size_estimate,
-                              {'n_samples': size,
-                               'graph': graph})
+        print 'UIS_WR sample size: ', size
+        collected[size] = plotter.run(3, uis_wr_size_estimate,
+                                      {'n_samples': size,
+                                       'graph': graph})
     
     plotter.print_data('uis_wr.data', collected)
     print 'Finished'
 
 if __name__ == "__main__":    
-    graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
-    print "Running extended Gnutella size estimate"
-    samples = 10000
-    print 'original size', graph.number_of_nodes()
-    print 'Estimated graph size ({0} samples): '.format(samples)
-    print uis_wr_size_estimate(graph, n_samples = samples)
+    sample()
+    #graph = nx.read_edgelist("p2p-Gnutella31.txt", delimiter='\t', nodetype=int)
+    #print "Running extended Gnutella size estimate"
+    #samples = 10000
+    #print 'original size', graph.number_of_nodes()
+    #print 'Estimated graph size ({0} samples): '.format(samples)
+    #print uis_wr_size_estimate(graph, n_samples = samples)
